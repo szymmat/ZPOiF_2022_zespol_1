@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.currencyRateVisualizer.HelloController">
+    <content>
+        <TableView fx:id="tableView">
+            <columns>
+                <TableColumn fx:id="firstColumn" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Nazwa" />
+                <TableColumn fx:id="secondColumn" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Kurs 5 dni temu" />
+                <TableColumn fx:id="thirdColumn" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Kurs obecny" />
+                <TableColumn fx:id="fourthColumn" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Zmiana" />
+            </columns>
+        </TableView>
+    </content>
+</ScrollPane>
