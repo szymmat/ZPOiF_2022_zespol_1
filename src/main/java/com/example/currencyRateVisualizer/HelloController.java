@@ -10,6 +10,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -47,6 +49,8 @@ public class HelloController implements Initializable {
     private DatePicker datePicker;
     @FXML
     private DatePicker endDatePicker;
+    @FXML
+    private LineChart<Number, Number> currencyChart;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -120,9 +124,15 @@ public class HelloController implements Initializable {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            alert.setTitle("OK");
-            alert.setContentText(String.valueOf(chartData.getRates().get(0).getMid()));
-            alert.showAndWait();
+            // TODO: Set title
+            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
+            for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
+                long date = LocalDate.parse(rate.getEffectiveDate(), dateTimeFormatter).toEpochDay();
+                series.getData().add(new XYChart.Data<>(date, rate.getMid()));
+            }
+            currencyChart.getData().add(series);
+            currencyChart.setVisible(true);
         });
     }
 
