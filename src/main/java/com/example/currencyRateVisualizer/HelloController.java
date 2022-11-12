@@ -6,6 +6,7 @@ import com.example.currencyRateVisualizer.tableModels.Rate;
 import com.example.currencyRateVisualizer.tableModels.TableData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.controlsfx.control.CheckComboBox;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -53,6 +55,8 @@ public class HelloController implements Initializable {
     private DatePicker endDatePicker;
     @FXML
     private LineChart<String, Number> currencyChart;
+    @FXML
+    private TabPane tabPane;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -63,6 +67,13 @@ public class HelloController implements Initializable {
         HttpResponse<String> response;
         try {
             response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException ex) {
+            Alert noConnectionAlert = new Alert(Alert.AlertType.ERROR);
+            noConnectionAlert.setHeaderText("Brak internetu");
+            noConnectionAlert.setContentText("Sprawdź połączenie internetowe i uruchom ponownie aplikację.");
+            noConnectionAlert.showAndWait();
+            Platform.exit();
+            return;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -78,6 +89,7 @@ public class HelloController implements Initializable {
         secondColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         thirdColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         fourthColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        tabPane.tabMinWidthProperty().bind(tableView.widthProperty().multiply(0.5));
 
         firstColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         secondColumn.setCellValueFactory(new PropertyValueFactory<>("earlyRate"));
@@ -118,11 +130,19 @@ public class HelloController implements Initializable {
                                 endDate.format(dateTimeFormatter))))
                         .build();
                 HttpResponse<String> chartResponse;
+                generateButton.setText("Ładowanie...");
                 try {
                     chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
+                } catch (ConnectException ex) {
+                    alert.setHeaderText("Brak internetu");
+                    alert.setContentText("Sprawdź połączenie internetowe");
+                    alert.showAndWait();
+                    generateButton.setText("Generuj wykres");
+                    return;
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
                 ObjectMapper chartMapper = new ObjectMapper();
                 ChartData chartData;
                 try {
@@ -139,6 +159,7 @@ public class HelloController implements Initializable {
                 currencyChart.getData().add(series);
             }
             currencyChart.setVisible(true);
+            generateButton.setText("Generuj wykres");
         });
     }
 

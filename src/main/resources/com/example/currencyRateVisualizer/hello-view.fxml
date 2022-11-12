@@ -21,7 +21,7 @@
 
 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.currencyRateVisualizer.HelloController">
     <content>
-        <TabPane>
+        <TabPane fx:id="tabPane">
             <tabs>
                 <Tab text="Tabela">
                     <content>
@@ -65,7 +65,7 @@
                                     <CheckComboBox fx:id="currencyChoiceBox" prefHeight="26.0" prefWidth="176.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                                             </children>
                                         </GridPane>
-                                        <LineChart fx:id="currencyChart" animated="false">
+                                        <LineChart fx:id="currencyChart" animated="false" visible="false">
                                             <xAxis>
                                                 <CategoryAxis label="Data" side="BOTTOM" />
                                             </xAxis>
