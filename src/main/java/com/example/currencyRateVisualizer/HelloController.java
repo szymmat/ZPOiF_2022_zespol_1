@@ -6,9 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
@@ -17,8 +15,11 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class HelloController implements Initializable {
     @FXML
@@ -33,6 +34,10 @@ public class HelloController implements Initializable {
     private TableColumn<TableData, Double> fourthColumn;
     @FXML
     private ChoiceBox<Rate> currencyChoiceBox;
+    @FXML
+    private Button generateButton;
+    @FXML
+    private DatePicker datePicker;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -64,6 +69,26 @@ public class HelloController implements Initializable {
 
         tableView.setItems(getTableData(currencyRates));
         currencyChoiceBox.setItems(FXCollections.observableArrayList(currencyRates[0].rates));
+        generateButton.setOnAction(actionEvent -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Błąd");
+            if (currencyChoiceBox.getValue() == null) {
+                alert.setHeaderText("Podaj walutę");
+                alert.setContentText("Podaj walutę dla wykresu");
+                alert.showAndWait();
+                return;
+            }
+            LocalDate currentDate = LocalDate.now();
+            LocalDate pickedDate = datePicker.getValue();
+            if (pickedDate == null || pickedDate.isAfter(currentDate) || DAYS.between(pickedDate, currentDate) > 366) {
+                alert.setHeaderText("Podaj poprawną datę");
+                alert.setContentText("Podaj datę co najwyżej rok przed dniem dzisiejszym");
+                alert.showAndWait();
+                return;
+            }
+            alert.setTitle("OK");
+            alert.showAndWait();
+        });
     }
 
     private ObservableList<TableData> getTableData(CurrencyRate[] currencyRates) {
