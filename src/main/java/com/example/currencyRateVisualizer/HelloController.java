@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -30,6 +31,8 @@ public class HelloController implements Initializable {
     private TableColumn<TableData, Double> thirdColumn;
     @FXML
     private TableColumn<TableData, Double> fourthColumn;
+    @FXML
+    private ChoiceBox<Rate> currencyChoiceBox;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -60,6 +63,7 @@ public class HelloController implements Initializable {
         fourthColumn.setCellValueFactory(new PropertyValueFactory<>("increase"));
 
         tableView.setItems(getTableData(currencyRates));
+        currencyChoiceBox.setItems(FXCollections.observableArrayList(currencyRates[0].rates));
     }
 
     private ObservableList<TableData> getTableData(CurrencyRate[] currencyRates) {
