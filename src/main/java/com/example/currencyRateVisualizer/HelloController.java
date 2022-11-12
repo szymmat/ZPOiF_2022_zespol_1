@@ -38,6 +38,8 @@ public class HelloController implements Initializable {
     private Button generateButton;
     @FXML
     private DatePicker datePicker;
+    @FXML
+    private DatePicker endDatePicker;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -78,11 +80,13 @@ public class HelloController implements Initializable {
                 alert.showAndWait();
                 return;
             }
+            LocalDate endDate = endDatePicker.getValue();
+            LocalDate startDate = datePicker.getValue();
             LocalDate currentDate = LocalDate.now();
-            LocalDate pickedDate = datePicker.getValue();
-            if (pickedDate == null || pickedDate.isAfter(currentDate) || DAYS.between(pickedDate, currentDate) > 366) {
+            if (startDate == null || endDate == null || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
+                    || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
                 alert.setHeaderText("Podaj poprawną datę");
-                alert.setContentText("Podaj datę co najwyżej rok przed dniem dzisiejszym");
+                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP)");
                 alert.showAndWait();
                 return;
             }

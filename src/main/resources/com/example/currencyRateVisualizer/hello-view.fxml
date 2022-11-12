@@ -43,13 +43,16 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <Label text="Podaj walutę:" GridPane.halignment="CENTER" />
-                              <Label text="Podaj datę początkową (max rok wstecz):" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                              <Label text="Podaj datę początkową:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                               <ChoiceBox fx:id="currencyChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                               <DatePicker fx:id="datePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                              <Button fx:id="generateButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                              <Button fx:id="generateButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                              <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                              <DatePicker fx:id="endDatePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                      </children>
