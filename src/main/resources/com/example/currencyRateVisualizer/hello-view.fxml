@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
@@ -64,9 +65,9 @@
                                                 <DatePicker fx:id="endDatePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                             </children>
                                         </GridPane>
-                                        <LineChart fx:id="currencyChart" visible="false">
+                                        <LineChart fx:id="currencyChart" animated="false">
                                             <xAxis>
-                                                <NumberAxis forceZeroInRange="false" label="Data" side="BOTTOM" />
+                                                <CategoryAxis label="Data" side="BOTTOM" />
                                             </xAxis>
                                             <yAxis>
                                                 <NumberAxis forceZeroInRange="false" label="Cena" side="LEFT" />

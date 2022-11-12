@@ -23,6 +23,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -50,7 +51,7 @@ public class HelloController implements Initializable {
     @FXML
     private DatePicker endDatePicker;
     @FXML
-    private LineChart<Number, Number> currencyChart;
+    private LineChart<String, Number> currencyChart;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -124,13 +125,14 @@ public class HelloController implements Initializable {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
+            currencyChart.getData().clear();
             // TODO: Set title
-            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
             for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
-                long date = LocalDate.parse(rate.getEffectiveDate(), dateTimeFormatter).toEpochDay();
-                series.getData().add(new XYChart.Data<>(date, rate.getMid()));
+                series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
             }
+            series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
             currencyChart.getData().add(series);
             currencyChart.setVisible(true);
         });
