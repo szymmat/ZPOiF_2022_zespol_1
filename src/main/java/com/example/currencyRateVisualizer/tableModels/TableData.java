@@ -1,4 +1,4 @@
-package com.example.currencyRateVisualizer;
+package com.example.currencyRateVisualizer.tableModels;
 
 public class TableData {
     private String name;

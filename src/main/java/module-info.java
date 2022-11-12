@@ -15,4 +15,7 @@ module com.example.currencyRateVisualizer {
 
     opens com.example.currencyRateVisualizer to javafx.fxml;
     exports com.example.currencyRateVisualizer;
+    exports com.example.currencyRateVisualizer.tableModels;
+    exports com.example.currencyRateVisualizer.chartModels;
+    opens com.example.currencyRateVisualizer.tableModels to javafx.fxml;
 }
