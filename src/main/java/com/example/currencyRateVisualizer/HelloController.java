@@ -14,6 +14,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.controlsfx.control.CheckComboBox;
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,7 +44,7 @@ public class HelloController implements Initializable {
     @FXML
     private TableColumn<TableData, Double> fourthColumn;
     @FXML
-    private ChoiceBox<Rate> currencyChoiceBox;
+    private CheckComboBox<Rate> currencyChoiceBox;
     @FXML
     private Button generateButton;
     @FXML
@@ -84,12 +85,12 @@ public class HelloController implements Initializable {
         fourthColumn.setCellValueFactory(new PropertyValueFactory<>("increase"));
 
         tableView.setItems(getTableData(currencyRates));
-        currencyChoiceBox.setItems(FXCollections.observableArrayList(currencyRates[0].getRates()));
+        currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRates[0].getRates()));
         generateButton.setOnAction(actionEvent -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Błąd");
-            Rate rateDialogValue = currencyChoiceBox.getValue();
-            if (rateDialogValue == null) {
+            ObservableList<Rate> rates = currencyChoiceBox.getCheckModel().getCheckedItems();
+            if (rates == null || rates.isEmpty()) {
                 alert.setHeaderText("Podaj walutę");
                 alert.setContentText("Podaj walutę dla wykresu");
                 alert.showAndWait();
@@ -105,35 +106,38 @@ public class HelloController implements Initializable {
                 alert.showAndWait();
                 return;
             }
-            HttpRequest chartRequest = HttpRequest.newBuilder()
-                    .header("Accept", "application/json")
-                    .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/A/%s/%s/%s/",
-                            rateDialogValue.getCode(),
-                            startDate.format(dateTimeFormatter),
-                            endDate.format(dateTimeFormatter))))
-                    .build();
-            HttpResponse<String> chartResponse;
-            try {
-                chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            ObjectMapper chartMapper = new ObjectMapper();
-            ChartData chartData;
-            try {
-                chartData = chartMapper.readValue(chartResponse.body(), ChartData.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
             currencyChart.getData().clear();
-            // TODO: Set title
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
-            for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
-                series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
+            currencyChart.setTitle("Kursy walut pomiędzy " + startDate.format(dateTimeFormatter) + " a "
+                    + endDate.format(dateTimeFormatter));
+            for (Rate selectedRate : rates) {
+                HttpRequest chartRequest = HttpRequest.newBuilder()
+                        .header("Accept", "application/json")
+                        .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/A/%s/%s/%s/",
+                                selectedRate.getCode(),
+                                startDate.format(dateTimeFormatter),
+                                endDate.format(dateTimeFormatter))))
+                        .build();
+                HttpResponse<String> chartResponse;
+                try {
+                    chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                ObjectMapper chartMapper = new ObjectMapper();
+                ChartData chartData;
+                try {
+                    chartData = chartMapper.readValue(chartResponse.body(), ChartData.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
+                for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
+                    series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
+                }
+                series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
+                currencyChart.getData().add(series);
             }
-            series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
-            currencyChart.getData().add(series);
             currencyChart.setVisible(true);
         });
     }
