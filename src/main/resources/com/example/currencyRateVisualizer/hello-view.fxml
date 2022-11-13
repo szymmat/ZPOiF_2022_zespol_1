@@ -122,6 +122,31 @@
                                   <NumberAxis forceZeroInRange="false" label="Cena" side="LEFT" />
                                 </yAxis>
                               </AreaChart>
+                              <GridPane fx:id="currencyDataGrid" visible="false">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Min" GridPane.halignment="CENTER" />
+                                    <Label text="Max" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                    <Label text="Początek" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                    <Label text="Koniec" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                    <Label text="Zmiana od daty początkowej do końcowej" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                    <Label fx:id="minLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                    <Label fx:id="maxLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                    <Label fx:id="startLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                    <Label fx:id="endLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                    <Label fx:id="changeLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                 </children>
+                              </GridPane>
                            </children>
                         </VBox>
                      </children>

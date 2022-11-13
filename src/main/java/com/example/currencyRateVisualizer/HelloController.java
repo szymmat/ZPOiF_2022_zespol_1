@@ -16,6 +16,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import org.controlsfx.control.CheckComboBox;
 
 import java.io.IOException;
@@ -68,6 +69,18 @@ public class HelloController implements Initializable {
     private TabPane tabPane;
     @FXML
     private Button generateAreaChartButton;
+    @FXML
+    private GridPane currencyDataGrid;
+    @FXML
+    private Label minLabel;
+    @FXML
+    private Label maxLabel;
+    @FXML
+    private Label startLabel;
+    @FXML
+    private Label endLabel;
+    @FXML
+    private Label changeLabel;
 
 
     @Override
@@ -195,7 +208,7 @@ public class HelloController implements Initializable {
                 return;
             }
             currencyAreaChart.getData().clear();
-            currencyAreaChart.setTitle("Kursy walut pomiędzy " + startDate.format(dateTimeFormatter) + " a "
+            currencyAreaChart.setTitle(selectedRate.getCurrency() + " pomiędzy " + startDate.format(dateTimeFormatter) + " a "
                     + endDate.format(dateTimeFormatter));
             HttpRequest chartRequest = HttpRequest.newBuilder()
                     .header("Accept", "application/json")
@@ -234,7 +247,21 @@ public class HelloController implements Initializable {
             currencyAreaChart.getData().add(series);
 
             currencyAreaChart.setVisible(true);
+            List<com.example.currencyRateVisualizer.chartModels.Rate> rateList = chartData.getRates();
             generateAreaChartButton.setText("Generuj wykres");
+            com.example.currencyRateVisualizer.chartModels.Rate minRate = rateList.stream()
+                    .min(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
+            com.example.currencyRateVisualizer.chartModels.Rate maxRate = rateList.stream()
+                    .max(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
+            com.example.currencyRateVisualizer.chartModels.Rate firstRate = rateList.get(0);
+            com.example.currencyRateVisualizer.chartModels.Rate lastRate = rateList.get(rateList.size() - 1);
+            double increase = ((lastRate.getMid() - firstRate.getMid()) / firstRate.getMid()) * 100;
+            minLabel.setText(String.format("%.2f (%s)", minRate.getMid(), minRate.getEffectiveDate()));
+            maxLabel.setText(String.format("%.2f (%s)", maxRate.getMid(), maxRate.getEffectiveDate()));
+            startLabel.setText(String.format("%.2f (%s)", firstRate.getMid(), firstRate.getEffectiveDate()));
+            endLabel.setText(String.format("%.2f (%s)", lastRate.getMid(), lastRate.getEffectiveDate()));
+            changeLabel.setText(String.format("%.2f%%", increase));
+            currencyDataGrid.setVisible(true);
         });
     }
 
