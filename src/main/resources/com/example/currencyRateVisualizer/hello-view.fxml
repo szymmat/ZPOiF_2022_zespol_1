@@ -6,6 +6,7 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -16,6 +17,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -46,27 +48,49 @@
                                         <Insets top="50.0" />
                                     </StackPane.margin>
                                     <children>
-                                        <GridPane maxHeight="150.0" maxWidth="500.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
+                                        <HBox alignment="CENTER" prefWidth="700.0">
                                             <children>
-                                                <Label text="Podaj walutę:" GridPane.halignment="CENTER" />
-                                                <Label text="Podaj datę początkową:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                <DatePicker fx:id="datePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                                <Button fx:id="generateButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                                <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                                <DatePicker fx:id="endDatePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <CheckComboBox fx:id="currencyChoiceBox" prefHeight="26.0" prefWidth="176.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                                <GridPane maxHeight="150.0" maxWidth="800.0" prefWidth="800.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <Label text="Podaj walutę:" GridPane.halignment="CENTER" />
+                                                        <Label text="Podaj datę początkową:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                        <DatePicker fx:id="datePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                        <Button fx:id="generateButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                        <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                        <DatePicker fx:id="endDatePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                        <CheckComboBox fx:id="currencyChoiceBox" prefHeight="26.0" prefWidth="176.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                                        <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                                            <buttons>
+                                                                <Button fx:id="comparisonStartWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
+                                                                <Button fx:id="comparisonStartMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
+                                                                <Button fx:id="comparisonStartThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
+                                                                <Button fx:id="comparisonStartYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
+                                                            </buttons>
+                                                        </ButtonBar>
+                                                        <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                                            <buttons>
+                                                                <Button fx:id="comparisonEndWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
+                                                                <Button fx:id="comparisonEndMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
+                                                                <Button fx:id="comparisonEndThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
+                                                                <Button fx:id="comparisonEndYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
+                                                            </buttons>
+                                                        </ButtonBar>
+                                                    </children>
+                                                </GridPane>
                                             </children>
-                                        </GridPane>
+                                        </HBox>
                                         <LineChart fx:id="currencyChart" animated="false" visible="false">
                                             <xAxis>
                                                 <CategoryAxis label="Data" side="BOTTOM" />
@@ -84,75 +108,97 @@
                         </StackPane>
                     </content>
                 </Tab>
-            <Tab closable="false" text="Podsumowanie pojedynczej waluty">
-               <content>
-                  <StackPane prefHeight="150.0" prefWidth="200.0">
-                     <children>
-                        <VBox alignment="TOP_CENTER" StackPane.alignment="TOP_CENTER">
-                           <StackPane.margin>
-                              <Insets top="50.0" />
-                           </StackPane.margin>
-                           <children>
-                              <GridPane maxHeight="150.0" maxWidth="500.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
+                <Tab closable="false" text="Podsumowanie pojedynczej waluty">
+                    <content>
+                        <StackPane prefHeight="150.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="TOP_CENTER" StackPane.alignment="TOP_CENTER">
+                                    <StackPane.margin>
+                                        <Insets top="50.0" />
+                                    </StackPane.margin>
+                                    <children>
+                              <HBox alignment="CENTER">
                                  <children>
-                                    <Label text="Podaj walutę:" GridPane.halignment="CENTER" />
-                                    <Label text="Podaj datę początkową:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <DatePicker fx:id="datePicker1" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Button fx:id="generateAreaChartButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                    <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <DatePicker fx:id="endDatePicker1" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <ChoiceBox fx:id="currencyChoiceBox1" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                              <GridPane prefWidth="800.0">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                  <children>
+                                                      <Label text="Podaj walutę:" GridPane.halignment="CENTER" />
+                                                      <Label text="Podaj datę początkową:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                      <DatePicker fx:id="datePicker1" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                      <Button fx:id="generateAreaChartButton" mnemonicParsing="false" text="Generuj wykres" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                      <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                      <DatePicker fx:id="endDatePicker1" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="currencyChoiceBox1" prefHeight="26.0" prefWidth="166.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                          <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                             <buttons>
+                                                <Button fx:id="summaryStartWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
+                                                <Button fx:id="summaryStartMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
+                                                <Button fx:id="summaryStartThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
+                                                <Button fx:id="summaryStartYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
+                                             </buttons>
+                                          </ButtonBar>
+                                          <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                             <buttons>
+                                                <Button fx:id="summaryEndWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
+                                                <Button fx:id="summaryEndMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
+                                                <Button fx:id="summaryEndThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
+                                                <Button fx:id="summaryEndYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
+                                             </buttons>
+                                          </ButtonBar>
+                                                  </children>
+                                              </GridPane>
                                  </children>
-                              </GridPane>
-                              <AreaChart fx:id="currencyAreaChart" animated="false" visible="false">
-                                <xAxis>
-                                  <CategoryAxis label="Data" side="BOTTOM" />
-                                </xAxis>
-                                <yAxis>
-                                  <NumberAxis forceZeroInRange="false" label="Cena" side="LEFT" />
-                                </yAxis>
-                              </AreaChart>
-                              <GridPane fx:id="currencyDataGrid" visible="false">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
-                                 <children>
-                                    <Label text="Min" GridPane.halignment="CENTER" />
-                                    <Label text="Max" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label text="Początek" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <Label text="Koniec" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                    <Label text="Zmiana od daty początkowej do końcowej" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-                                    <Label fx:id="minLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-                                    <Label fx:id="maxLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label fx:id="startLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <Label fx:id="endLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                    <Label fx:id="changeLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-                                 </children>
-                              </GridPane>
-                           </children>
-                        </VBox>
-                     </children>
-                  </StackPane>
-               </content>
-            </Tab>
+                              </HBox>
+                                        <AreaChart fx:id="currencyAreaChart" animated="false" visible="false">
+                                            <xAxis>
+                                                <CategoryAxis label="Data" side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis forceZeroInRange="false" label="Cena" side="LEFT" />
+                                            </yAxis>
+                                        </AreaChart>
+                                        <GridPane fx:id="currencyDataGrid" visible="false">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Min" GridPane.halignment="CENTER" />
+                                                <Label text="Max" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                <Label text="Początek" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                <Label text="Koniec" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                <Label text="Zmiana od daty początkowej do końcowej" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                                <Label fx:id="minLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                                <Label fx:id="maxLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                <Label fx:id="startLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                <Label fx:id="endLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                                <Label fx:id="changeLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
     </content>
