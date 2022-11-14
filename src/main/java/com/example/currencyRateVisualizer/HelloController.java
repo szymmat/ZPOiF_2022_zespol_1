@@ -172,10 +172,13 @@ public class HelloController implements Initializable {
             LocalDate endDate = endDatePicker.getValue();
             LocalDate startDate = datePicker.getValue();
             LocalDate currentDate = LocalDate.now();
-            if (startDate == null || endDate == null || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
+            LocalDate earliestDate = LocalDate.of(2002, 1, 2);
+            if (startDate == null || endDate == null || startDate.isBefore(earliestDate) || endDate.isBefore(earliestDate)
+                    || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
                     || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
                 alert.setHeaderText("Podaj poprawną datę");
-                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP)");
+                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP). " +
+                        "Data musi być z przedziału od 2 stycznia 2002 r. do dzisiaj.");
                 alert.showAndWait();
                 return;
             }
@@ -235,10 +238,13 @@ public class HelloController implements Initializable {
             LocalDate endDate = endDatePicker1.getValue();
             LocalDate startDate = datePicker1.getValue();
             LocalDate currentDate = LocalDate.now();
-            if (startDate == null || endDate == null || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
+            LocalDate earliestDate = LocalDate.of(2002, 1, 2);
+            if (startDate == null || endDate == null || startDate.isBefore(earliestDate) || endDate.isBefore(earliestDate)
+                    || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
                     || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
                 alert.setHeaderText("Podaj poprawną datę");
-                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP)");
+                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP). " +
+                        "Data musi być z przedziału od 2 stycznia 2002 r. do dzisiaj.");
                 alert.showAndWait();
                 return;
             }
