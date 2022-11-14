@@ -42,22 +42,6 @@ public class HelloController implements Initializable {
     private final HttpClient httpClient = HttpClient.newBuilder().build();
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @FXML
-    private Button comparisonStartWeekAgoButton;
-    @FXML
-    private Button comparisonStartMonthAgoButton;
-    @FXML
-    private Button comparisonStartThreeMonthsAgoButton;
-    @FXML
-    private Button comparisonStartYearAgoButton;
-    @FXML
-    private Button comparisonEndWeekAgoButton;
-    @FXML
-    private Button comparisonEndMonthAgoButton;
-    @FXML
-    private Button comparisonEndThreeMonthsAgoButton;
-    @FXML
-    private Button comparisonEndYearAgoButton;
-    @FXML
     private Button summaryStartWeekAgoButton;
     @FXML
     private Button summaryStartMonthAgoButton;
@@ -65,14 +49,6 @@ public class HelloController implements Initializable {
     private Button summaryStartThreeMonthsAgoButton;
     @FXML
     private Button summaryStartYearAgoButton;
-    @FXML
-    private Button summaryEndWeekAgoButton;
-    @FXML
-    private Button summaryEndMonthAgoButton;
-    @FXML
-    private Button summaryEndThreeMonthsAgoButton;
-    @FXML
-    private Button summaryEndYearAgoButton;
     @FXML
     private TableView<TableData> tableView;
     @FXML
@@ -304,25 +280,11 @@ public class HelloController implements Initializable {
             changeLabel.setText(String.format("%.2f%%", increase));
             currencyDataGrid.setVisible(true);
         });
-        comparisonStartWeekAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker, Interval.WEEK));
-        comparisonEndWeekAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker, Interval.WEEK));
-        summaryStartWeekAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker1, Interval.WEEK));
-        summaryEndWeekAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker1, Interval.WEEK));
 
-        comparisonStartMonthAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker1, Interval.MONTH));
-        comparisonEndMonthAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker, Interval.MONTH));
-        summaryStartMonthAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker1, Interval.MONTH));
-        summaryEndMonthAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker1, Interval.MONTH));
-
-        comparisonStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker, Interval.THREE_MONTHS));
-        comparisonEndThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker, Interval.THREE_MONTHS));
-        summaryStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker1, Interval.THREE_MONTHS));
-        summaryEndThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker1, Interval.THREE_MONTHS));
-
-        comparisonStartYearAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker, Interval.YEAR));
-        comparisonEndYearAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker, Interval.YEAR));
-        summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickerValue(datePicker1, Interval.YEAR));
-        summaryEndYearAgoButton.setOnAction(actionEvent -> setDatePickerValue(endDatePicker1, Interval.YEAR));
+        summaryStartWeekAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.WEEK));
+        summaryStartMonthAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.MONTH));
+        summaryStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.THREE_MONTHS));
+        summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.YEAR));
     }
 
     private ObservableList<TableData> getTableData(CurrencyRate[] currencyRates) {
@@ -343,13 +305,14 @@ public class HelloController implements Initializable {
         return Math.round(d * 10000.0) / 10000.0;
     }
 
-    private void setDatePickerValue(DatePicker datePicker, Interval interval) {
+    private void setDatePickersValue(Interval interval) {
         LocalDate now = LocalDate.now();
         switch (interval) {
-            case WEEK -> datePicker.setValue(now.minusWeeks(1));
-            case MONTH -> datePicker.setValue(now.minusMonths(1));
-            case THREE_MONTHS -> datePicker.setValue(now.minusMonths(3));
-            case YEAR -> datePicker.setValue(now.minusYears(1));
+            case WEEK -> datePicker1.setValue(now.minusWeeks(1));
+            case MONTH -> datePicker1.setValue(now.minusMonths(1));
+            case THREE_MONTHS -> datePicker1.setValue(now.minusMonths(3));
+            case YEAR -> datePicker1.setValue(now.minusYears(1));
         }
+        endDatePicker1.setValue(now);
     }
 }

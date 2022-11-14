@@ -54,8 +54,6 @@
                                                     <columnConstraints>
                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     </columnConstraints>
                                                     <rowConstraints>
                                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -71,22 +69,6 @@
                                                         <Label text="Podaj datę końcową:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                         <DatePicker fx:id="endDatePicker" showWeekNumbers="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                                         <CheckComboBox fx:id="currencyChoiceBox" prefHeight="26.0" prefWidth="176.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-                                                        <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
-                                                            <buttons>
-                                                                <Button fx:id="comparisonStartWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
-                                                                <Button fx:id="comparisonStartMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
-                                                                <Button fx:id="comparisonStartThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
-                                                                <Button fx:id="comparisonStartYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
-                                                            </buttons>
-                                                        </ButtonBar>
-                                                        <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2">
-                                                            <buttons>
-                                                                <Button fx:id="comparisonEndWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
-                                                                <Button fx:id="comparisonEndMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
-                                                                <Button fx:id="comparisonEndThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
-                                                                <Button fx:id="comparisonEndYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
-                                                            </buttons>
-                                                        </ButtonBar>
                                                     </children>
                                                 </GridPane>
                                             </children>
@@ -142,18 +124,10 @@
                                                       <ChoiceBox fx:id="currencyChoiceBox1" prefHeight="26.0" prefWidth="166.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                                           <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                                              <buttons>
-                                                <Button fx:id="summaryStartWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
-                                                <Button fx:id="summaryStartMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
-                                                <Button fx:id="summaryStartThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
-                                                <Button fx:id="summaryStartYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
-                                             </buttons>
-                                          </ButtonBar>
-                                          <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2">
-                                             <buttons>
-                                                <Button fx:id="summaryEndWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Tydzień temu" />
-                                                <Button fx:id="summaryEndMonthAgoButton" mnemonicParsing="false" text="Miesiąc temu" />
-                                                <Button fx:id="summaryEndThreeMonthsAgoButton" mnemonicParsing="false" text="3 miesiące temu" />
-                                                <Button fx:id="summaryEndYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Rok temu" />
+                                                <Button fx:id="summaryStartWeekAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Ostatni tydzień" />
+                                                <Button fx:id="summaryStartMonthAgoButton" mnemonicParsing="false" text="Ostatni miesiąc" />
+                                                <Button fx:id="summaryStartThreeMonthsAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="136.0" text="Ostatnie 3 m-ce" />
+                                                <Button fx:id="summaryStartYearAgoButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="104.0" text="Ostatni rok" />
                                              </buttons>
                                           </ButtonBar>
                                                   </children>
