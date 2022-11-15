@@ -96,30 +96,11 @@ public class HelloController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .header("Accept", "application/json")
-                .uri(URI.create("http://api.nbp.pl/api/exchangerates/tables/A/last/5/"))
-                .build();
-        HttpResponse<String> response;
-        try {
-            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (ConnectException ex) {
-            Alert noConnectionAlert = new Alert(Alert.AlertType.ERROR);
-            noConnectionAlert.setHeaderText("Brak internetu");
-            noConnectionAlert.setContentText("Sprawdź połączenie internetowe i uruchom ponownie aplikację.");
-            noConnectionAlert.showAndWait();
-            Platform.exit();
-            return;
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        CurrencyRate[] currencyRates;
-        try {
-            currencyRates = mapper.readValue(response.body(), CurrencyRate[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        CurrencyRate[] currencyRatesA = fetchCurrencyRates("http://api.nbp.pl/api/exchangerates/tables/A/last/5/");
+        ObservableList<TableData> tableData = FXCollections.observableArrayList();
+        if (currencyRatesA != null) getTableData(currencyRatesA, tableData);
+        CurrencyRate[] currencyRatesB = fetchCurrencyRates("http://api.nbp.pl/api/exchangerates/tables/B/last/5/");
+        if (currencyRatesB != null) getTableData(currencyRatesB, tableData);
 
         firstColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         secondColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
@@ -132,9 +113,13 @@ public class HelloController implements Initializable {
         thirdColumn.setCellValueFactory(new PropertyValueFactory<>("currentRate"));
         fourthColumn.setCellValueFactory(new PropertyValueFactory<>("increase"));
 
-        tableView.setItems(getTableData(currencyRates));
-        currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRates[0].getRates()));
-        currencyChoiceBox1.setItems(FXCollections.observableArrayList(currencyRates[0].getRates()));
+        tableView.setItems(tableData);
+        if (currencyRatesA != null && currencyRatesB != null) {
+            currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
+            //currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
+            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
+            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
+        }
         generateButton.setOnAction(actionEvent -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Błąd");
@@ -227,9 +212,14 @@ public class HelloController implements Initializable {
             currencyAreaChart.getData().clear();
             currencyAreaChart.setTitle(selectedRate.getCurrency() + " pomiędzy " + startDate.format(dateTimeFormatter) + " a "
                     + endDate.format(dateTimeFormatter));
+            boolean isARate = false;
+            if (currencyRatesA != null) {
+                isARate = currencyRatesA[0].getRates().contains(selectedRate);
+            }
             HttpRequest chartRequest = HttpRequest.newBuilder()
                     .header("Accept", "application/json")
-                    .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/A/%s/%s/%s/",
+                    .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/%s/%s/%s/%s/",
+                            isARate ? "A" : "B",
                             selectedRate.getCode(),
                             startDate.format(dateTimeFormatter),
                             endDate.format(dateTimeFormatter))))
@@ -287,8 +277,7 @@ public class HelloController implements Initializable {
         summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.YEAR));
     }
 
-    private ObservableList<TableData> getTableData(CurrencyRate[] currencyRates) {
-        ObservableList<TableData> tableData = FXCollections.observableArrayList();
+    private void getTableData(CurrencyRate[] currencyRates, ObservableList<TableData> tableData) {
         List<Rate> rates = currencyRates[0].getRates();
         for (int i = 0; i < rates.size(); i++) {
             Rate rate = rates.get(i);
@@ -298,7 +287,6 @@ public class HelloController implements Initializable {
             double increase = round(((currentRate - earlyRate) / earlyRate) * 100);
             tableData.add(new TableData(name, earlyRate, currentRate, increase));
         }
-        return tableData;
     }
 
     private double round(double d) {
@@ -314,5 +302,33 @@ public class HelloController implements Initializable {
             case YEAR -> datePicker1.setValue(now.minusYears(1));
         }
         endDatePicker1.setValue(now);
+    }
+
+    private CurrencyRate[] fetchCurrencyRates(String url) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header("Accept", "application/json")
+                .uri(URI.create(url))
+                .build();
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException ex) {
+            Alert noConnectionAlert = new Alert(Alert.AlertType.ERROR);
+            noConnectionAlert.setHeaderText("Brak internetu");
+            noConnectionAlert.setContentText("Sprawdź połączenie internetowe i uruchom ponownie aplikację.");
+            noConnectionAlert.showAndWait();
+            Platform.exit();
+            return null;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        CurrencyRate[] currencyRates;
+        try {
+            currencyRates = mapper.readValue(response.body(), CurrencyRate[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return currencyRates;
     }
 }
