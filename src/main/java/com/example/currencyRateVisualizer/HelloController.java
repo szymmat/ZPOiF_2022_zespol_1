@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.WorldMapView;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -28,9 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -93,6 +92,12 @@ public class HelloController implements Initializable {
     private Label endLabel;
     @FXML
     private Label changeLabel;
+    @FXML
+    private WorldMapView worldMapView;
+    @FXML
+    private Label countryLabel;
+    @FXML
+    private Label currencyMapLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -106,7 +111,7 @@ public class HelloController implements Initializable {
         secondColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         thirdColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         fourthColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        tabPane.tabMinWidthProperty().bind(tableView.widthProperty().multiply(0.333));
+        tabPane.tabMinWidthProperty().bind(tableView.widthProperty().multiply(0.25));
 
         firstColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         secondColumn.setCellValueFactory(new PropertyValueFactory<>("earlyRate"));
@@ -275,6 +280,27 @@ public class HelloController implements Initializable {
         summaryStartMonthAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.MONTH));
         summaryStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.THREE_MONTHS));
         summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.YEAR));
+
+        worldMapView.setOnMouseClicked(mouseEvent -> {
+            ObservableList<WorldMapView.Country> countries = worldMapView.getSelectedCountries();
+            if (countries.isEmpty()) {
+                countryLabel.setText("Wybierz kraj z mapy");
+                currencyMapLabel.setText("");
+            } else {
+                Locale locale = new Locale("", countries.get(0).name());
+                countryLabel.setText(countries.get(0).getLocale().getDisplayCountry());
+                currencyMapLabel.setText(Currency.getInstance(locale).getDisplayName(Locale.getDefault()));
+            }
+        });
+        worldMapView.setOnScroll(scrollEvent -> {
+            double delta = scrollEvent.getDeltaY();
+            if (delta < 0) {
+                worldMapView.setZoomFactor(worldMapView.getZoomFactor() - 0.5);
+            } else {
+                worldMapView.setZoomFactor(worldMapView.getZoomFactor() + 0.5);
+            }
+            scrollEvent.consume();
+        });
     }
 
     private void getTableData(CurrencyRate[] currencyRates, ObservableList<TableData> tableData) {
