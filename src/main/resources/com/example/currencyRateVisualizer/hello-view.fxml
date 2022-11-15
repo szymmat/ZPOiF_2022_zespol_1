@@ -15,6 +15,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -194,11 +195,12 @@
                                  <children>
                                     <Label fx:id="countryLabel" text="Wybierz kraj z mapy" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                                     <Label fx:id="currencyMapLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label fx:id="currencyMapValueLabel" text="Label" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowSpan="2">
+                                    <Label fx:id="currencyMapValueLabel" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowSpan="2">
                                        <font>
                                           <Font size="30.0" />
                                        </font>
                                     </Label>
+                                    <ImageView fx:id="countryFlag" fitHeight="75.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowSpan="2" />
                                  </children>
                               </GridPane>
                               <WorldMapView fx:id="worldMapView" countrySelectionMode="SINGLE" locationSelectionMode="SINGLE" zoomFactor="3.0" />

@@ -16,6 +16,8 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.WorldMapView;
@@ -100,6 +102,8 @@ public class HelloController implements Initializable {
     private Label currencyMapLabel;
     @FXML
     private Label currencyMapValueLabel;
+    @FXML
+    private ImageView countryFlag;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -289,10 +293,13 @@ public class HelloController implements Initializable {
                 countryLabel.setText("Wybierz kraj z mapy");
                 currencyMapLabel.setText("");
                 currencyMapValueLabel.setText("");
+                countryFlag.setImage(null);
             } else {
                 Locale locale = new Locale("", countries.get(0).name());
                 countryLabel.setText(countries.get(0).getLocale().getDisplayCountry());
                 currencyMapLabel.setText(Currency.getInstance(locale).getDisplayName(Locale.getDefault()));
+                String flagURL = String.format("https://countryflagsapi.com/png/%s", countries.get(0).name());
+                countryFlag.setImage(new Image(flagURL));
                 String currencyCode = Currency.getInstance(locale).getCurrencyCode();
                 Optional<Double> rateValue = Optional.empty();
                 if (currencyRatesA != null && currencyRatesB != null) {
