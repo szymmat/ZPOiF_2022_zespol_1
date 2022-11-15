@@ -98,6 +98,8 @@ public class HelloController implements Initializable {
     private Label countryLabel;
     @FXML
     private Label currencyMapLabel;
+    @FXML
+    private Label currencyMapValueLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -286,10 +288,24 @@ public class HelloController implements Initializable {
             if (countries.isEmpty()) {
                 countryLabel.setText("Wybierz kraj z mapy");
                 currencyMapLabel.setText("");
+                currencyMapValueLabel.setText("");
             } else {
                 Locale locale = new Locale("", countries.get(0).name());
                 countryLabel.setText(countries.get(0).getLocale().getDisplayCountry());
                 currencyMapLabel.setText(Currency.getInstance(locale).getDisplayName(Locale.getDefault()));
+                String currencyCode = Currency.getInstance(locale).getCurrencyCode();
+                Optional<Double> rateValue = Optional.empty();
+                if (currencyRatesA != null && currencyRatesB != null) {
+                    List<Rate> aRates = currencyRatesA[4].getRates().stream().filter(r -> Objects.equals(r.getCode(), currencyCode)).toList();
+                    if (!aRates.isEmpty()) rateValue = Optional.ofNullable(aRates.get(0).getMid());
+                    List<Rate> bRates = currencyRatesB[4].getRates().stream().filter(r -> Objects.equals(r.getCode(), currencyCode)).toList();
+                    if (!bRates.isEmpty()) rateValue = Optional.ofNullable(bRates.get(0).getMid());
+                }
+                if (rateValue.isEmpty()) {
+                    currencyMapValueLabel.setText("Brak danych");
+                } else {
+                    currencyMapValueLabel.setText(String.format("%.2f", rateValue.get()));
+                }
             }
         });
         worldMapView.setOnScroll(scrollEvent -> {
