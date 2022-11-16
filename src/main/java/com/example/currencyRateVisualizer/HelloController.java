@@ -112,180 +112,47 @@ public class HelloController implements Initializable {
         if (currencyRatesA != null) getTableData(currencyRatesA, tableData);
         CurrencyRate[] currencyRatesB = fetchCurrencyRates("http://api.nbp.pl/api/exchangerates/tables/B/last/5/");
         if (currencyRatesB != null) getTableData(currencyRatesB, tableData);
-
-        firstColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        secondColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        thirdColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        fourthColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        tabPane.tabMinWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-
-        firstColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        secondColumn.setCellValueFactory(new PropertyValueFactory<>("earlyRate"));
-        thirdColumn.setCellValueFactory(new PropertyValueFactory<>("currentRate"));
-        fourthColumn.setCellValueFactory(new PropertyValueFactory<>("increase"));
-
-        tableView.setItems(tableData);
-        if (currencyRatesA != null && currencyRatesB != null) {
-            currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
-            //currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
-            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
-            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
-        }
+        setChoiceBoxProperties(currencyRatesA, currencyRatesB);
+        setTabsEqualWidth();
+        setTableViewProperties(tableData);
+        setHelperButtonsActions();
         generateButton.setOnAction(actionEvent -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Błąd");
             ObservableList<Rate> rates = currencyChoiceBox.getCheckModel().getCheckedItems();
-            if (rates == null || rates.isEmpty()) {
-                alert.setHeaderText("Podaj walutę");
-                alert.setContentText("Podaj walutę dla wykresu");
-                alert.showAndWait();
-                return;
-            }
+            if (!validateRates(rates)) return;
             LocalDate endDate = endDatePicker.getValue();
             LocalDate startDate = datePicker.getValue();
-            LocalDate currentDate = LocalDate.now();
-            LocalDate earliestDate = LocalDate.of(2002, 1, 2);
-            if (startDate == null || endDate == null || startDate.isBefore(earliestDate) || endDate.isBefore(earliestDate)
-                    || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
-                    || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
-                alert.setHeaderText("Podaj poprawną datę");
-                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP). " +
-                        "Data musi być z przedziału od 2 stycznia 2002 r. do dzisiaj.");
-                alert.showAndWait();
-                return;
-            }
+            if (!validateDates(startDate, endDate)) return;
             currencyChart.getData().clear();
             currencyChart.setTitle("Kursy walut pomiędzy " + startDate.format(dateTimeFormatter) + " a "
                     + endDate.format(dateTimeFormatter));
             for (Rate selectedRate : rates) {
-                HttpRequest chartRequest = HttpRequest.newBuilder()
-                        .header("Accept", "application/json")
-                        .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/A/%s/%s/%s/",
-                                selectedRate.getCode(),
-                                startDate.format(dateTimeFormatter),
-                                endDate.format(dateTimeFormatter))))
-                        .build();
-                HttpResponse<String> chartResponse;
-                generateButton.setText("Ładowanie...");
-                try {
-                    chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
-                } catch (ConnectException ex) {
-                    alert.setHeaderText("Brak internetu");
-                    alert.setContentText("Sprawdź połączenie internetowe");
-                    alert.showAndWait();
-                    generateButton.setText("Generuj wykres");
-                    return;
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-                ObjectMapper chartMapper = new ObjectMapper();
-                ChartData chartData;
-                try {
-                    chartData = chartMapper.readValue(chartResponse.body(), ChartData.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                XYChart.Series<String, Number> series = new XYChart.Series<>();
-                series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
-                for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
-                    series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
-                }
-                series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
+                ChartData chartData = fetchChartData(startDate, endDate, selectedRate, true);
+                if (chartData == null) return;
+                XYChart.Series<String, Number> series = processChartData(chartData);
                 currencyChart.getData().add(series);
             }
             currencyChart.setVisible(true);
             generateButton.setText("Generuj wykres");
         });
         generateAreaChartButton.setOnAction(actionEvent -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Błąd");
             Rate selectedRate = currencyChoiceBox1.getValue();
-            if (selectedRate == null) {
-                alert.setHeaderText("Podaj walutę");
-                alert.setContentText("Podaj walutę dla wykresu");
-                alert.showAndWait();
-                return;
-            }
+            if (!validateRates(FXCollections.observableArrayList(selectedRate))) return;
             LocalDate endDate = endDatePicker1.getValue();
             LocalDate startDate = datePicker1.getValue();
-            LocalDate currentDate = LocalDate.now();
-            LocalDate earliestDate = LocalDate.of(2002, 1, 2);
-            if (startDate == null || endDate == null || startDate.isBefore(earliestDate) || endDate.isBefore(earliestDate)
-                    || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
-                    || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
-                alert.setHeaderText("Podaj poprawną datę");
-                alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP). " +
-                        "Data musi być z przedziału od 2 stycznia 2002 r. do dzisiaj.");
-                alert.showAndWait();
-                return;
-            }
+            if (!validateDates(startDate, endDate)) return;
             currencyAreaChart.getData().clear();
             currencyAreaChart.setTitle(selectedRate.getCurrency() + " pomiędzy " + startDate.format(dateTimeFormatter) + " a "
                     + endDate.format(dateTimeFormatter));
-            boolean isARate = false;
-            if (currencyRatesA != null) {
-                isARate = currencyRatesA[0].getRates().contains(selectedRate);
-            }
-            HttpRequest chartRequest = HttpRequest.newBuilder()
-                    .header("Accept", "application/json")
-                    .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/%s/%s/%s/%s/",
-                            isARate ? "A" : "B",
-                            selectedRate.getCode(),
-                            startDate.format(dateTimeFormatter),
-                            endDate.format(dateTimeFormatter))))
-                    .build();
-            HttpResponse<String> chartResponse;
-            generateAreaChartButton.setText("Ładowanie...");
-            try {
-                chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
-            } catch (ConnectException ex) {
-                alert.setHeaderText("Brak internetu");
-                alert.setContentText("Sprawdź połączenie internetowe");
-                alert.showAndWait();
-                generateAreaChartButton.setText("Generuj wykres");
-                return;
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            ObjectMapper chartMapper = new ObjectMapper();
-            ChartData chartData;
-            try {
-                chartData = chartMapper.readValue(chartResponse.body(), ChartData.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
-            for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
-                series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
-            }
-            series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
+            boolean isARate = checkARate(currencyRatesA, selectedRate);
+            ChartData chartData = fetchChartData(startDate, endDate, selectedRate, isARate);
+            if (chartData == null) return;
+            XYChart.Series<String, Number> series = processChartData(chartData);
             currencyAreaChart.getData().add(series);
-
             currencyAreaChart.setVisible(true);
-            List<com.example.currencyRateVisualizer.chartModels.Rate> rateList = chartData.getRates();
             generateAreaChartButton.setText("Generuj wykres");
-            com.example.currencyRateVisualizer.chartModels.Rate minRate = rateList.stream()
-                    .min(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
-            com.example.currencyRateVisualizer.chartModels.Rate maxRate = rateList.stream()
-                    .max(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
-            com.example.currencyRateVisualizer.chartModels.Rate firstRate = rateList.get(0);
-            com.example.currencyRateVisualizer.chartModels.Rate lastRate = rateList.get(rateList.size() - 1);
-            double increase = ((lastRate.getMid() - firstRate.getMid()) / firstRate.getMid()) * 100;
-            minLabel.setText(String.format("%.2f (%s)", minRate.getMid(), minRate.getEffectiveDate()));
-            maxLabel.setText(String.format("%.2f (%s)", maxRate.getMid(), maxRate.getEffectiveDate()));
-            startLabel.setText(String.format("%.2f (%s)", firstRate.getMid(), firstRate.getEffectiveDate()));
-            endLabel.setText(String.format("%.2f (%s)", lastRate.getMid(), lastRate.getEffectiveDate()));
-            changeLabel.setText(String.format("%.2f%%", increase));
-            currencyDataGrid.setVisible(true);
+            setSummaryLabels(chartData);
         });
 
-        summaryStartWeekAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.WEEK));
-        summaryStartMonthAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.MONTH));
-        summaryStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.THREE_MONTHS));
-        summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.YEAR));
 
         worldMapView.setOnMouseClicked(mouseEvent -> {
             ObservableList<WorldMapView.Country> countries = worldMapView.getSelectedCountries();
@@ -379,5 +246,134 @@ public class HelloController implements Initializable {
             throw new RuntimeException(e);
         }
         return currencyRates;
+    }
+
+    private void setTabsEqualWidth() {
+        tabPane.tabMinWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+    }
+
+    private void setTableViewProperties(ObservableList<TableData> tableData) {
+        firstColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        secondColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        thirdColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        fourthColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        firstColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        secondColumn.setCellValueFactory(new PropertyValueFactory<>("earlyRate"));
+        thirdColumn.setCellValueFactory(new PropertyValueFactory<>("currentRate"));
+        fourthColumn.setCellValueFactory(new PropertyValueFactory<>("increase"));
+        tableView.setItems(tableData);
+    }
+
+    private void setChoiceBoxProperties(CurrencyRate[] currencyRatesA, CurrencyRate[] currencyRatesB) {
+        if (currencyRatesA != null && currencyRatesB != null) {
+            currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
+            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
+            currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
+        }
+    }
+
+    private boolean validateRates(ObservableList<Rate> rates) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Błąd");
+        if (rates == null || rates.isEmpty()) {
+            alert.setHeaderText("Podaj walutę");
+            alert.setContentText("Podaj walutę dla wykresu");
+            alert.showAndWait();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateDates(LocalDate startDate, LocalDate endDate) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Błąd");
+        LocalDate currentDate = LocalDate.now();
+        LocalDate earliestDate = LocalDate.of(2002, 1, 2);
+        if (startDate == null || endDate == null || startDate.isBefore(earliestDate) || endDate.isBefore(earliestDate)
+                || startDate.isAfter(currentDate) || endDate.isAfter(currentDate)
+                || startDate.isAfter(endDate) || DAYS.between(startDate, endDate) > 366) {
+            alert.setHeaderText("Podaj poprawną datę");
+            alert.setContentText("Daty mogą się różnić co najwyżej o rok (ograniczenie API NBP). " +
+                    "Data musi być z przedziału od 2 stycznia 2002 r. do dzisiaj.");
+            alert.showAndWait();
+            return false;
+        }
+        return true;
+    }
+
+    private ChartData fetchChartData(LocalDate startDate, LocalDate endDate, Rate selectedRate, boolean isARate) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Błąd");
+        HttpRequest chartRequest = HttpRequest.newBuilder()
+                .header("Accept", "application/json")
+                .uri(URI.create(String.format("http://api.nbp.pl/api/exchangerates/rates/%s/%s/%s/%s/",
+                        isARate ? "A" : "B",
+                        selectedRate.getCode(),
+                        startDate.format(dateTimeFormatter),
+                        endDate.format(dateTimeFormatter))))
+                .build();
+        HttpResponse<String> chartResponse;
+        generateButton.setText("Ładowanie...");
+        try {
+            chartResponse = httpClient.send(chartRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException ex) {
+            alert.setHeaderText("Brak internetu");
+            alert.setContentText("Sprawdź połączenie internetowe");
+            alert.showAndWait();
+            generateButton.setText("Generuj wykres");
+            return null;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        ObjectMapper chartMapper = new ObjectMapper();
+        ChartData chartData;
+        try {
+            chartData = chartMapper.readValue(chartResponse.body(), ChartData.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return chartData;
+    }
+
+    private XYChart.Series<String, Number> processChartData(ChartData chartData) {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
+        for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
+            series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
+        }
+        series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
+        return series;
+    }
+
+    private boolean checkARate(CurrencyRate[] currencyRatesA, Rate selectedRate) {
+        if (currencyRatesA != null) {
+            return currencyRatesA[0].getRates().contains(selectedRate);
+        }
+        return false;
+    }
+
+    private void setSummaryLabels(ChartData chartData) {
+        List<com.example.currencyRateVisualizer.chartModels.Rate> rateList = chartData.getRates();
+        com.example.currencyRateVisualizer.chartModels.Rate minRate = rateList.stream()
+                .min(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
+        com.example.currencyRateVisualizer.chartModels.Rate maxRate = rateList.stream()
+                .max(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
+        com.example.currencyRateVisualizer.chartModels.Rate firstRate = rateList.get(0);
+        com.example.currencyRateVisualizer.chartModels.Rate lastRate = rateList.get(rateList.size() - 1);
+        double increase = ((lastRate.getMid() - firstRate.getMid()) / firstRate.getMid()) * 100;
+        minLabel.setText(String.format("%.2f (%s)", minRate.getMid(), minRate.getEffectiveDate()));
+        maxLabel.setText(String.format("%.2f (%s)", maxRate.getMid(), maxRate.getEffectiveDate()));
+        startLabel.setText(String.format("%.2f (%s)", firstRate.getMid(), firstRate.getEffectiveDate()));
+        endLabel.setText(String.format("%.2f (%s)", lastRate.getMid(), lastRate.getEffectiveDate()));
+        changeLabel.setText(String.format("%.2f%%", increase));
+        currencyDataGrid.setVisible(true);
+    }
+
+    private void setHelperButtonsActions() {
+        summaryStartWeekAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.WEEK));
+        summaryStartMonthAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.MONTH));
+        summaryStartThreeMonthsAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.THREE_MONTHS));
+        summaryStartYearAgoButton.setOnAction(actionEvent -> setDatePickersValue(Interval.YEAR));
     }
 }
