@@ -194,9 +194,9 @@ public class HelloController implements Initializable {
     }
 
     private void getTableData(CurrencyRate[] currencyRates, ObservableList<TableData> tableData) {
-        List<Rate> rates = currencyRates[0].getRates();
+        List<Rate> rates = currencyRates[4].getRates();
         for (int i = 0; i < rates.size(); i++) {
-            Rate rate = rates.get(i);
+            Rate rate = currencyRates[0].getRates().get(i);
             double earlyRate = round(currencyRates[4].getRates().get(i).getMid());
             String name = rate.getCode() + " " + rate.getCurrency();
             double currentRate = round(rate.getMid());
