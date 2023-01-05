@@ -104,6 +104,8 @@ public class HelloController implements Initializable {
     private Label currencyMapValueLabel;
     @FXML
     private ImageView countryFlag;
+    @FXML
+    private ChoiceBox<Rate> currencyToCompareChoiceBox;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -136,21 +138,22 @@ public class HelloController implements Initializable {
         });
         generateAreaChartButton.setOnAction(actionEvent -> {
             Rate selectedRate = currencyChoiceBox1.getValue();
+            Rate rateToCompare = currencyToCompareChoiceBox.getValue();
             if (!validateRates(FXCollections.observableArrayList(selectedRate))) return;
             LocalDate endDate = endDatePicker1.getValue();
             LocalDate startDate = datePicker1.getValue();
             if (!validateDates(startDate, endDate)) return;
             currencyAreaChart.getData().clear();
-            currencyAreaChart.setTitle(selectedRate.getCurrency() + " pomiędzy " + startDate.format(dateTimeFormatter) + " a "
+            currencyAreaChart.setTitle(selectedRate.getCurrency() + " do " + rateToCompare.getCurrency() + " pomiędzy " + startDate.format(dateTimeFormatter) + " a "
                     + endDate.format(dateTimeFormatter));
             boolean isARate = checkARate(currencyRatesA, selectedRate);
-            ChartData chartData = fetchChartData(startDate, endDate, selectedRate, isARate);
-            if (chartData == null) return;
-            XYChart.Series<String, Number> series = processChartData(chartData);
+            ChartData[] chartData = fetchAreaChartData(startDate, endDate, selectedRate, isARate, rateToCompare);
+            if (chartData[0] == null) return;
+            XYChart.Series<String, Number> series = processAreaChartData(chartData);
             currencyAreaChart.getData().add(series);
             currencyAreaChart.setVisible(true);
             generateAreaChartButton.setText("Generuj wykres");
-            setSummaryLabels(chartData);
+            setSummaryLabels(series);
         });
 
 
@@ -269,13 +272,20 @@ public class HelloController implements Initializable {
             currencyChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
             currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
             currencyChoiceBox1.getItems().addAll(FXCollections.observableArrayList(currencyRatesB[0].getRates()));
+            Rate defaultRate = new Rate();
+            defaultRate.setCode("PLN");
+            defaultRate.setCurrency("złoty polski");
+            defaultRate.setMid(1.00);
+            currencyToCompareChoiceBox.getItems().add(defaultRate);
+            currencyToCompareChoiceBox.setValue(defaultRate);
+            currencyToCompareChoiceBox.getItems().addAll(FXCollections.observableArrayList(currencyRatesA[0].getRates()));
         }
     }
 
     private boolean validateRates(ObservableList<Rate> rates) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Błąd");
-        if (rates == null || rates.isEmpty()) {
+        if (rates == null || rates.isEmpty() || rates.stream().allMatch(Objects::isNull)) {
             alert.setHeaderText("Podaj walutę");
             alert.setContentText("Podaj walutę dla wykresu");
             alert.showAndWait();
@@ -336,11 +346,37 @@ public class HelloController implements Initializable {
         return chartData;
     }
 
+    private ChartData[] fetchAreaChartData(LocalDate startDate, LocalDate endDate, Rate selectedRate, boolean isARate, Rate rateToCompare) {
+        ChartData selectedRateData = fetchChartData(startDate, endDate, selectedRate, isARate);
+        ChartData rateToCompareData = rateToCompare.getCode().equals("PLN")
+                ? null
+                : fetchChartData(startDate, endDate, rateToCompare, true);
+        ChartData[] chartData = new ChartData[2];
+        chartData[0] = selectedRateData;
+        chartData[1] = rateToCompareData;
+        return chartData;
+    }
+
     private XYChart.Series<String, Number> processChartData(ChartData chartData) {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName(String.format("%s (%s)", chartData.getCurrency(), chartData.getCode()));
         for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData.getRates()) {
             series.getData().add(new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid()));
+        }
+        series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
+        return series;
+    }
+
+    private XYChart.Series<String, Number> processAreaChartData(ChartData[] chartData) {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName(String.format("%s (%s)", chartData[0].getCurrency(), chartData[0].getCode()));
+        for (com.example.currencyRateVisualizer.chartModels.Rate rate : chartData[0].getRates()) {
+            XYChart.Data<String, Number> data = new XYChart.Data<>(rate.getEffectiveDate(), rate.getMid());
+            if (chartData[1] != null) {
+                double divider = chartData[1].getRates().get(chartData[0].getRates().indexOf(rate)).getMid();
+                data.setYValue(data.getYValue().doubleValue() / divider);
+            }
+            series.getData().add(data);
         }
         series.getData().sort(Comparator.comparing(XYChart.Data::getXValue));
         return series;
@@ -353,19 +389,20 @@ public class HelloController implements Initializable {
         return false;
     }
 
-    private void setSummaryLabels(ChartData chartData) {
-        List<com.example.currencyRateVisualizer.chartModels.Rate> rateList = chartData.getRates();
-        com.example.currencyRateVisualizer.chartModels.Rate minRate = rateList.stream()
-                .min(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
-        com.example.currencyRateVisualizer.chartModels.Rate maxRate = rateList.stream()
-                .max(Comparator.comparing(com.example.currencyRateVisualizer.chartModels.Rate::getMid)).get();
-        com.example.currencyRateVisualizer.chartModels.Rate firstRate = rateList.get(0);
-        com.example.currencyRateVisualizer.chartModels.Rate lastRate = rateList.get(rateList.size() - 1);
-        double increase = ((lastRate.getMid() - firstRate.getMid()) / firstRate.getMid()) * 100;
-        minLabel.setText(String.format("%.2f (%s)", minRate.getMid(), minRate.getEffectiveDate()));
-        maxLabel.setText(String.format("%.2f (%s)", maxRate.getMid(), maxRate.getEffectiveDate()));
-        startLabel.setText(String.format("%.2f (%s)", firstRate.getMid(), firstRate.getEffectiveDate()));
-        endLabel.setText(String.format("%.2f (%s)", lastRate.getMid(), lastRate.getEffectiveDate()));
+    private void setSummaryLabels(XYChart.Series<String, Number> series) {
+        ObservableList<XYChart.Data<String, Number>> data = series.getData();
+        XYChart.Data<String, Number> minRate = data.stream()
+                .min(Comparator.comparing(d -> d.getYValue().doubleValue())).get();
+        XYChart.Data<String, Number> maxRate = data.stream()
+                .max(Comparator.comparing(d -> d.getYValue().doubleValue())).get();
+        XYChart.Data<String, Number> firstRate = data.get(0);
+        XYChart.Data<String, Number> lastRate = data.get(data.size() - 1);
+        double increase = ((lastRate.getYValue().doubleValue() - firstRate.getYValue().doubleValue())
+                / firstRate.getYValue().doubleValue()) * 100;
+        minLabel.setText(String.format("%.2f (%s)", minRate.getYValue().doubleValue(), minRate.getXValue()));
+        maxLabel.setText(String.format("%.2f (%s)", maxRate.getYValue().doubleValue(), maxRate.getXValue()));
+        startLabel.setText(String.format("%.2f (%s)", firstRate.getYValue().doubleValue(), firstRate.getXValue()));
+        endLabel.setText(String.format("%.2f (%s)", lastRate.getYValue().doubleValue(), lastRate.getXValue()));
         changeLabel.setText(String.format("%.2f%%", increase));
         currencyDataGrid.setVisible(true);
     }
